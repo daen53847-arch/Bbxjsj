@@ -1,0 +1,119 @@
+-- Neon Anime Speed GUI
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+
+local speed = 16
+local MAX = 2000
+local STEP = 25
+
+-- UI
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.ResetOnSpawn = false
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 300, 0, 180)
+main.Position = UDim2.new(0.03, 0, 0.55, 0)
+main.BackgroundColor3 = Color3.fromRGB(20,20,30)
+main.Active, main.Draggable = true, true
+main.Visible = true
+
+-- Neon stroke
+local stroke = Instance.new("UIStroke", main)
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(0, 255, 255)
+stroke.Transparency = 0.1
+
+-- Gradient
+local grad = Instance.new("UIGradient", main)
+grad.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 200, 255))
+}
+grad.Rotation = 45
+
+-- Corner
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 18)
+
+-- Title
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "⚡ ANIME SPEED ⚡"
+title.TextScaled = true
+title.Font = Enum.Font.GothamBlack
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.BackgroundTransparency = 1
+
+-- Speed label
+local label = Instance.new("TextLabel", main)
+label.Position = UDim2.new(0, 0, 0.28, 0)
+label.Size = UDim2.new(1, 0, 0, 35)
+label.Text = "Speed : 16"
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.TextColor3 = Color3.fromRGB(0,255,255)
+label.BackgroundTransparency = 1
+
+-- Buttons
+local function neonButton(text, x)
+	local b = Instance.new("TextButton", main)
+	b.Size = UDim2.new(0.42, 0, 0, 45)
+	b.Position = UDim2.new(x, 0, 0.55, 0)
+	b.Text = text
+	b.TextScaled = true
+	b.Font = Enum.Font.GothamBlack
+	b.TextColor3 = Color3.fromRGB(255,255,255)
+	b.BackgroundColor3 = Color3.fromRGB(35,35,50)
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 14)
+
+	local s = Instance.new("UIStroke", b)
+	s.Thickness = 2
+	s.Color = Color3.fromRGB(255, 0, 255)
+	return b
+end
+
+local plus = neonButton("➕", 0.05)
+local minus = neonButton("➖", 0.53)
+
+-- Hide/Show
+local toggle = Instance.new("TextButton", gui)
+toggle.Size = UDim2.new(0, 120, 0, 40)
+toggle.Position = UDim2.new(0.03, 0, 0.9, 0)
+toggle.Text = "👁 TOGGLE UI"
+toggle.TextScaled = true
+toggle.Font = Enum.Font.GothamBold
+toggle.TextColor3 = Color3.new(1,1,1)
+toggle.BackgroundColor3 = Color3.fromRGB(40,40,60)
+Instance.new("UICorner", toggle).CornerRadius = UDim.new(0, 12)
+local ts = Instance.new("UIStroke", toggle)
+ts.Color = Color3.fromRGB(0,255,255)
+ts.Thickness = 2
+
+-- Logic
+local function apply()
+	speed = math.clamp(speed, 0, MAX)
+	hum.WalkSpeed = speed
+	label.Text = "Speed : "..speed
+end
+
+plus.MouseButton1Click:Connect(function()
+	speed += STEP
+	apply()
+end)
+
+minus.MouseButton1Click:Connect(function()
+	speed -= STEP
+	apply()
+end)
+
+toggle.MouseButton1Click:Connect(function()
+	main.Visible = not main.Visible
+end)
+
+player.CharacterAdded:Connect(function(c)
+	char = c
+	hum = c:WaitForChild("Humanoid")
+	apply()
+end)
+
+apply()
